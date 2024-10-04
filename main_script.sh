@@ -43,8 +43,13 @@ for excel in "$OUTPUT_DIR"/*.xlsx; do
     if ! ls "$RAW_EXCELS_FOLDER"/*"$date"*.XLSX >/dev/null 2>&1; then
         echo "Running processing script on $excel"
         python3 "$PROCESSING_SCRIPT" "$excel" "$RAW_EXCELS_FOLDER"
-        if [ $? -ne 0 ]; then
+        output=$(python3 "$PROCESSING_SCRIPT" "$excel" "$RAW_EXCELS_FOLDER" 2>&1)
+        exit_code=$?
+        
+        if [ $exit_code -ne 0 ]; then
             echo "Error occurred while processing $excel"
+            echo "Python script output:"
+            echo "$output"
         fi
     else
         echo "Raw file for $date already in folder, skipping"
