@@ -4,6 +4,8 @@ import formulas
 def calculate_file(path_to_file, path_to_output_folder):
     """
     Runs in like 5 minutes and takes 4.5G of RAM for a 5MB file for some reason
+    The resulting file also has extension ".XLSX" so we have to take care of 
+    that in the bash script
     """
     xl_model = formulas.ExcelModel().loads(path_to_file).finish()
     xl_model.calculate()
