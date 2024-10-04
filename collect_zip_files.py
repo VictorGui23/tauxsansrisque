@@ -74,12 +74,14 @@ def download_files(path_to_folder, url):
             if cur_date is not None and cur_date not in dates_in_folder and int(cur_date) > 20230601:
                 download_file(url, path_to_folder, "EIOPA_RFR_" + cur_date + ".zip")
                 time.sleep(5)
-            if cur_date in dates_in_folder:
+            if cur_date is None:
+                print("File name format ({}) is unrecognized.".format(url))
+            elif cur_date in dates_in_folder:
                 print("Date {} already in folder. Skipping.".format(cur_date))
-            if int(cur_date) <= 20230601:
+            elif int(cur_date) <= 20230601:
                 # avant juin 2023 les courbes ne contiennent pas la valeur 
                 # alpha pour certains onglets donc je préfère ne pas m'embêter
-                print("Date {} earlier than threshold of June, 2023.")
+                print("Date {} earlier than threshold of June, 2023.".format(cur_date))
 
     else:
         print(f"Request failed with status code: {response.status_code}")
