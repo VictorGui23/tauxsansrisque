@@ -1,9 +1,10 @@
+import os 
+import re
+import sys
 import pandas as pd 
 from datetime import datetime
-import re
 from constants import DB_COLUMNS as db_columns
 from constants import NAMES_TO_COLLECT_VPS as names_to_collect
-import sys
 
 def extract_date(text):
     pattern = r'(\d{2}_\d{2}_\d{4})'
@@ -95,8 +96,12 @@ def create_complete_db(dict_of_dfs, countries):
     return complete_db
 
 def file_to_db_format(path_to_input: str,
-                        path_to_output: str = None):
+                        path_to_output_folder: str = None):
     
+    file_name = os.path.basename(path_to_input)
+    
+    output_file = "ready_for_db_" + file_name
+
     curve = pd.read_excel(path_to_input, sheet_name = None, engine = "openpyxl")
 
     processed_sheets = process_dfs(curve, names_to_collect)
@@ -108,12 +113,12 @@ def file_to_db_format(path_to_input: str,
     db = create_complete_db(processed_sheets, countries)
     print(db.head())
     if path_to_output is not None:
-        db.to_excel(path_to_output, index= False)
+        db.to_excel(os.path.join(path_to_output_folder, output_file), index= False)
 
     return db
 if __name__ == "__main__":
     if len(sys.argv) != 3:
-        print("Usage: python3 process_raw_excel.py file_path output_path")
+        print("Usage: python3 process_raw_excel.py file_path output_folder_path")
         sys.exit(1)
 
     path_to_file = sys.argv[1]
