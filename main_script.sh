@@ -58,4 +58,18 @@ done
 
 echo "Processing complete"
 
+for file in "$RAW_EXCELS_FOLDER"/*.XLSX; do
+    # Check if files with .abc extension exist
+    if [ -e "$file" ]; then
+        # Get the filename without the extension
+        filename="${file%.XLSX}"
+        # Rename the file with the new extension
+        mv "$file" "${filename}.xlsx"
+        echo "Renamed $file to ${filename}.xlsx"
+    else
+        echo "No files with .XLSX extension found in the directory"
+        exit 1
+    fi
+done
+
 deactivate
