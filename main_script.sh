@@ -24,4 +24,33 @@ done
 
 echo "Extraction complete"
 
+mkdir -p "$RAW_EXCELS_FOLDER"
+
+if [ -z "$(ls -A "$OUTPUT_DIR"/*.xlsx 2>/dev/null)" ]; then
+    echo "No .xlsx files found in $OUTPUT_DIR"
+    exit 1
+fi
+
+for excel in "$OUTPUT_DIR"/*.xlsx; do
+    echo "Processing file $excel"
+    date=$(basename "$excel" | grep -oP '\d{8}')
+    
+    if [ -z "$date" ]; then
+        echo "Could not extract date from filename $excel, skipping"
+        continue
+    fi
+
+    if ! ls "$RAW_EXCELS_FOLDER"/*"$date"*.XLSX >/dev/null 2>&1; then
+        echo "Running processing script on $excel"
+        python3 "$PROCESSING_SCRIPT" "$excel" "$RAW_EXCELS_FOLDER"
+        if [ $? -ne 0 ]; then
+            echo "Error occurred while processing $excel"
+        fi
+    else
+        echo "Raw file for $date already in folder, skipping"
+    fi
+done
+
+echo "Processing complete"
+
 deactivate
