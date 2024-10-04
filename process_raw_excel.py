@@ -99,7 +99,7 @@ def file_to_db_format(path_to_input: str,
                         path_to_output_folder: str = None):
     
     file_name = os.path.basename(path_to_input)
-    
+
     output_file = "ready_for_db_" + file_name
 
     curve = pd.read_excel(path_to_input, sheet_name = None, engine = "openpyxl")
@@ -111,7 +111,6 @@ def file_to_db_format(path_to_input: str,
     countries = [x for x in df_spot_no_va.columns if x != "INDEX"]
 
     db = create_complete_db(processed_sheets, countries)
-    print(db.head())
     if path_to_output is not None:
         db.to_excel(os.path.join(path_to_output_folder, output_file), index= False)
 
