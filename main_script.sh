@@ -1,6 +1,6 @@
 #!/bin/bash
 
-source "$(dirname "$0")/config.sh"
+source config.sh
 
 mkdir -p "$INPUT_DIR"
 mkdir -p "$OUTPUT_DIR"
