@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rate Curve Plotter</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        header {
+            background-color: #f0f0f0;
+            padding: 1rem;
+            text-align: center;
+        }
+        main {
+            display: flex;
+            flex-grow: 1;
+        }
+        .sidebar {
+            width: 250px;
+            padding: 1rem;
+            background-color: #f9f9f9;
+        }
+        .plot-area {
+            flex-grow: 1;
+            padding: 1rem;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around;
+        }
+        .plot-container {
+            width: calc(50% - 1rem);
+            margin-bottom: 1rem;
+            height: 500px;
+        }
+        footer {
+            background-color: #f0f0f0;
+            padding: 1rem;
+            text-align: center;
+        }
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+        select, input[type="month"] {
+            width: calc(100% - 30px);
+            padding: 0.5rem;
+        }
+        .checkbox-group {
+            margin-bottom: 1rem;
+        }
+        .checkbox-group > label {
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+        .checkbox-option {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.25rem;
+        }
+        .checkbox-option label {
+            margin-bottom: 0;
+        }
+        .date-container, .country-container {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+        .date-container button, .country-container button {
+            margin-left: 0.5rem;
+            cursor: pointer;
+        }
+        #addDateBtn, #addCountryBtn {
+            margin-top: 0.5rem;
+        }
+        @media (max-width: 1200px) {
+            .plot-container {
+                width: 100%;
+            }
+        }
+        @media (max-width: 768px) {
+            main {
+                flex-direction: column;
+            }
+            .sidebar {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Rate Curve Plotter</h1>
+    </header>
+    <main>
+        <div class="sidebar">
+            <h2>Plot Options</h2>
+            <form id="plotForm">
+                <div class="form-group" id="countryGroup">
+                    <label>Countries:</label>
+                    <div class="country-container">
+                        <select name="country" required>
+                            <option value="United States">United States</option>
+                            <option value="France">France</option>
+                            <option value="Euro" selected>European Union</option>
+                        </select>
+                        <button type="button" class="removeCountryBtn" style="display:none;">X</button>
+                    </div>
+                </div>
+                <button type="button" id="addCountryBtn">+ Add Country</button>
+
+                <div class="form-group" id="dateGroup">
+                    <label>Month and Year:</label>
+                    <div class="date-container">
+                        <input type="month" name="date" required>
+                        <button type="button" class="removeDateBtn" style="display:none;">X</button>
+                    </div>
+                </div>
+                <button type="button" id="addDateBtn">+ Add Date</button>
+
+                <div class="checkbox-group">
+                    <label>Volatility Adjustment:</label>
+                    <div class="checkbox-option">
+                        <label for="va-no">No Adjustment</label>
+                        <input type="checkbox" id="va-no" name="volatility" value="no" checked>
+                    </div>
+                    <div class="checkbox-option">
+                        <label for="va-yes">With Adjustment</label>
+                        <input type="checkbox" id="va-yes" name="volatility" value="yes">
+                    </div>
+                </div>
+
+                <div class="checkbox-group">
+                    <label>Shock:</label>
+                    <div class="checkbox-option">
+                        <label for="shock-none">No Shock</label>
+                        <input type="checkbox" id="shock-none" name="shock" value="none" checked>
+                    </div>
+                    <div class="checkbox-option">
+                        <label for="shock-up">Upwards Shock</label>
+                        <input type="checkbox" id="shock-up" name="shock" value="up">
+                    </div>
+                    <div class="checkbox-option">
+                        <label for="shock-down">Downwards Shock</label>
+                        <input type="checkbox" id="shock-down" name="shock" value="down">
+                    </div>
+                </div>
+
+                <button type="submit">Generate Plot</button>
+                <button type="reset">Reset</button>
+            </form>
+        </div>
+        <div class="plot-area" id="plotArea">
+            <!-- Plots will be inserted here -->
+        </div>
+    </main>
+    <footer>
+        &copy; 2024 Rate Curve Plotter
+    </footer>
+    <script>
+        const addDateBtn = document.getElementById('addDateBtn');
+        const dateGroup = document.getElementById('dateGroup');
+        const addCountryBtn = document.getElementById('addCountryBtn');
+        const countryGroup = document.getElementById('countryGroup');
+
+        function addRemoveButtonFunctionality(groupElement, addButtonElement, inputName, maxInputs) {
+            groupElement.addEventListener('click', (e) => {
+                if (e.target.classList.contains('removeDateBtn') || e.target.classList.contains('removeCountryBtn')) {
+                    e.target.closest('.date-container, .country-container').remove();
+                    addButtonElement.style.display = 'inline-block';
+
+                    if (document.querySelectorAll(`[name="${inputName}"]`).length === 1) {
+                        document.querySelector(`.remove${inputName.charAt(0).toUpperCase() + inputName.slice(1)}Btn`).style.display = 'none';
+                    }
+                }
+            });
+
+            addButtonElement.addEventListener('click', () => {
+                if (document.querySelectorAll(`[name="${inputName}"]`).length < maxInputs) {
+                    const newContainer = document.createElement('div');
+                    newContainer.className = `${inputName}-container`;
+                    if (inputName === 'date') {
+                        newContainer.innerHTML = `
+                            <input type="month" name="${inputName}" required>
+                            <button type="button" class="remove${inputName.charAt(0).toUpperCase() + inputName.slice(1)}Btn">X</button>
+                        `;
+                    } else {
+                        newContainer.innerHTML = `
+                            <select name="${inputName}" required>
+                                <option value="United States">United States</option>
+                                <option value="France">France</option>
+                                <option value="European Union">European Union</option>
+                            </select>
+                            <button type="button" class="remove${inputName.charAt(0).toUpperCase() + inputName.slice(1)}Btn">X</button>
+                        `;
+                    }
+                    groupElement.appendChild(newContainer);
+
+                    if (document.querySelectorAll(`[name="${inputName}"]`).length === maxInputs) {
+                        addButtonElement.style.display = 'none';
+                    }
+
+                    document.querySelector(`.remove${inputName.charAt(0).toUpperCase() + inputName.slice(1)}Btn`).style.display = 'inline-block';
+                }
+            });
+        }
+
+        addRemoveButtonFunctionality(dateGroup, addDateBtn, 'date', 4);
+        addRemoveButtonFunctionality(countryGroup, addCountryBtn, 'country', 4);
+
+        document.getElementById('plotForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const countries = Array.from(document.querySelectorAll('select[name="country"]')).map(select => select.value);
+            const dates = Array.from(document.querySelectorAll('input[name="date"]')).map(input => input.value + '-01');
+            const volatilityOptions = document.querySelectorAll('input[name="volatility"]:checked');
+            const shockOptions = document.querySelectorAll('input[name="shock"]:checked');
+            
+            const plotArea = document.getElementById('plotArea');
+            plotArea.innerHTML = ''; // Clear existing plots
+
+            const layout = {
+                autosize: true,
+                margin: { l: 50, r: 50, b: 100, t: 50, pad: 4 },
+                xaxis: { title: 'Period' },
+                yaxis: { title: 'Rate' },
+                legend: { orientation: 'h', y: -0.2 },
+                showlegend: true
+            };
+
+            // Adjust layout based on the number of countries
+            if (countries.length === 1) {
+                plotArea.style.display = 'block';
+            } else {
+                plotArea.style.display = 'flex';
+            }
+
+            countries.forEach(country => {
+                const plotContainer = document.createElement('div');
+                plotContainer.className = 'plot-container';
+                plotContainer.id = `plot-${country.replace(/\s+/g, '-')}`;
+                plotArea.appendChild(plotContainer);
+
+                const plotData = [];
+                const promises = [];
+
+                dates.forEach(date => {
+                    volatilityOptions.forEach(va => {
+                        shockOptions.forEach(shock => {
+                            const vaInt = va.value === 'yes' ? '1' : '0';
+                            const shockInt = shock.value === 'up' ? '1' : (shock.value === 'down' ? '-1' : '0');
+                            
+                            const promise = fetch(`http://localhost:5000/api/rate_curve?country=${country}&date=${date}&va_int=${vaInt}&shock_int=${shockInt}`)
+                                .then(response => response.json())
+                                .then(data => {
+                                    const periods = data.map(item => item.period);
+                                    const rates = data.map(item => item.rate);
+                                    
+                                    plotData.push({
+                                        x: periods,
+                                        y: rates,
+                                        mode: 'lines+markers',
+                                        type: 'scatter',
+                                        name: `${date.slice(0, 7)}, VA: ${va.value}, Shock: ${shock.value}`
+                                    });
+                                });
+                            
+                            promises.push(promise);
+                        });
+                    });
+                });
+
+                Promise.all(promises).then(() => {
+                    const countryLayout = {
+                        ...layout,
+                        title: `Rate Curves for ${country}`
+                    };
+                    
+                    Plotly.newPlot(`plot-${country.replace(/\s+/g, '-')}`, plotData, countryLayout, {responsive: true});
+                }).catch(error => console.error('Error:', error));
+            });
+        });
+
+        // Adjust plot sizes on window resize
+        window.addEventListener('resize', function() {
+            const plots = document.querySelectorAll('.plot-container');
+            plots.forEach(plot => {
+                Plotly.Plots.resize(plot);
+            });
+        });
+    </script>
+</body>
+</html>
