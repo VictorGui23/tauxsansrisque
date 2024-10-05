@@ -40,7 +40,7 @@ for excel in "$OUTPUT_DIR"/*.xlsx; do
         continue
     fi
 
-    if ! ls "$RAW_EXCELS_FOLDER"/*"$date"*.XLSX >/dev/null 2>&1; then
+    if ! ls "$RAW_EXCELS_FOLDER"/*"$date"*.xlsx >/dev/null 2>&1; then
         echo "Running processing script on $excel"
         python3 "$PROCESSING_SCRIPT" "$excel" "$RAW_EXCELS_FOLDER"
         output=$(python3 "$PROCESSING_SCRIPT" "$excel" "$RAW_EXCELS_FOLDER" 2>&1)
