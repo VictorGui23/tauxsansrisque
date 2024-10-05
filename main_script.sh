@@ -72,17 +72,28 @@ for file in "$RAW_EXCELS_FOLDER"/*.XLSX; do
 done
 
 for file in "$RAW_EXCELS_FOLDER"/*.xlsx; do
-    if [ -e "$file" ]; then
-        echo "Running formatting script on $file"
-        python3 "$FORMATTING_SCRIPT" "$file" "$FORMATTED_FILES_FOLDER"
-        output=$(python3 "$FORMATTING_SCRIPT" "$file" "$FORMATTED_FILES_FOLDER" 2>&1)
-        exit_code=$?
-        
-        if [ $exit_code -ne 0 ]; then
-            echo "Error occurred while formatting $file"
-            echo "Python script output:"
-            echo "$output"
+
+    date=$(basename "$file" | grep -oP '\d{8}')
+    if [ -z "$date" ]; then
+            echo "Could not extract date from filename $file, skipping"
+            continue
         fi
+    if ! ls "$FORMATTED_FILES_FOLDER"/*"$date"*.xlsx >/dev/null 2>&1; then    
+
+        if [ -e "$file" ]; then
+            echo "Running formatting script on $file"
+            python3 "$FORMATTING_SCRIPT" "$file" "$FORMATTED_FILES_FOLDER"
+            output=$(python3 "$FORMATTING_SCRIPT" "$file" "$FORMATTED_FILES_FOLDER" 2>&1)
+            exit_code=$?
+            
+            if [ $exit_code -ne 0 ]; then
+                echo "Error occurred while formatting $file"
+                echo "Python script output:"
+                echo "$output"
+            fi
+        fi
+    else 
+        echo "Formatted file for $date already in folder, skipping"
     fi
 done
 
