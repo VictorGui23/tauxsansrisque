@@ -86,4 +86,21 @@ for file in "$RAW_EXCELS_FOLDER"/*.xlsx; do
     fi
 done
 
+for file in "$FORMATTED_FILES_FOLDER"/*.xlsx; do
+    if [ -e "$file" ]; then
+        echo "Uploading $file on table $TABLE_NAME"
+        python3 "$UPLOADING_SCRIPT" "$file" "$TABLE_NAME"
+        output=$(python3 "$UPLOADING_SCRIPT" "$file" "$TABLE_NAME" 2>&1)
+        exit_code=$?
+        
+        if [ $exit_code -ne 0 ]; then
+            echo "Error occurred while uploading $file"
+            echo "Python script output:"
+            echo "$output"
+            else
+            echo "Successfully loaded file"
+        fi
+    fi
+done
+
 deactivate
