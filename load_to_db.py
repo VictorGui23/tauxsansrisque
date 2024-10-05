@@ -52,7 +52,7 @@ def check_date(engine, table_name, date_column, date_str):
 def test_connection(engine):
     try:
         with engine.connect() as connection:
-            result = connection.execute(text("SELECT 1"))
+            connection.execute(text("SELECT 1"))
             return 1
     except SQLAlchemyError as e:
         return e
