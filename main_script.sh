@@ -82,5 +82,6 @@ for file in "$RAW_EXCELS_FOLDER"/*.xlsx; do
             echo "Python script output:"
             echo "$output"
         fi
+    fi
 
 deactivate
