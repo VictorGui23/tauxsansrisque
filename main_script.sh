@@ -68,7 +68,6 @@ for file in "$RAW_EXCELS_FOLDER"/*.XLSX; do
         echo "Renamed $file to ${filename}.xlsx"
     else
         echo "No files with .XLSX extension found in the directory"
-        exit 1
     fi
 done
 
