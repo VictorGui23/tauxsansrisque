@@ -83,5 +83,6 @@ for file in "$RAW_EXCELS_FOLDER"/*.xlsx; do
             echo "$output"
         fi
     fi
+done
 
 deactivate
