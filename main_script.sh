@@ -28,7 +28,6 @@ mkdir -p "$RAW_EXCELS_FOLDER"
 
 if [ -z "$(ls -A "$OUTPUT_DIR"/*.xlsx 2>/dev/null)" ]; then
     echo "No .xlsx files found in $OUTPUT_DIR"
-    exit 1
 fi
 
 for excel in "$OUTPUT_DIR"/*.xlsx; do
