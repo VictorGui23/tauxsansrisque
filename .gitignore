@@ -4,3 +4,4 @@ config.sh
 /zip_curves
 /RFR_files_as_values
 /tauxsansrisque
+/__pycache__

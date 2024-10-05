@@ -8,11 +8,11 @@ CORS(app, resources={r"/api/*": {"origins": "http://localhost:8000"}})
 
 def get_db_connection():
     conn = psycopg2.connect(
-        host = DB_PARAMS.host,
-        port = DB_PARAMS.port,
-        database = DB_PARAMS.database,
-        user = DB_PARAMS.user,
-        password = DB_PARAMS.password
+        host = DB_PARAMS["host"],
+        port = DB_PARAMS["port"],
+        database = DB_PARAMS["database"],
+        user = DB_PARAMS["user"],
+        password = DB_PARAMS["password"]
     )
     return conn
 

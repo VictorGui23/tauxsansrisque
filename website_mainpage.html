@@ -200,7 +200,7 @@
                             <select name="${inputName}" required>
                                 <option value="United States">United States</option>
                                 <option value="France">France</option>
-                                <option value="European Union">European Union</option>
+                                <option value="Euro">European Union</option>
                             </select>
                             <button type="button" class="remove${inputName.charAt(0).toUpperCase() + inputName.slice(1)}Btn">X</button>
                         `;
@@ -284,7 +284,7 @@
                 Promise.all(promises).then(() => {
                     const countryLayout = {
                         ...layout,
-                        title: `Rate Curves for ${country}`
+                        title: `Rate Curve(s) for ${country}`
                     };
                     
                     Plotly.newPlot(`plot-${country.replace(/\s+/g, '-')}`, plotData, countryLayout, {responsive: true});
