@@ -1,12 +1,14 @@
 import sys
+import pandas as pd
 from datetime import datetime
 from sqlalchemy import create_engine, text
 from sqlalchemy.exc import SQLAlchemyError
 
-from process_raw_excel import file_to_db_format
 from credentials import DB_PARAMS
 
-def load_file(file_as_df, engine, table_name):
+def load_file(file_path, engine, table_name):
+
+    file_as_df = pd.read_excel(file_path, engine = "openpyxl")
     # check connection
     connection = test_connection(engine)
     if connection == 1:
@@ -66,6 +68,4 @@ if __name__ == "__main__":
 
     table_name = sys.argv[2]
 
-    file = file_to_db_format(path_to_file)
-
-    load_file(file, engine, table_name)
+    load_file(path_to_file, engine, table_name)
