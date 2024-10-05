@@ -73,7 +73,7 @@ done
 
 for file in "$RAW_EXCELS_FOLDER"/*.xlsx; do
     if [ -e "$file" ]; then
-        echo "Running formatting script on $excel"
+        echo "Running formatting script on $file"
         python3 "$FORMATTING_SCRIPT" "$file" "$FORMATTED_FILES_FOLDER"
         output=$(python3 "$FORMATTING_SCRIPT" "$file" "$FORMATTED_FILES_FOLDER" 2>&1)
         exit_code=$?
